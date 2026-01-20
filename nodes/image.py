@@ -14,8 +14,24 @@ from PIL.PngImagePlugin import PngImageFile
 from PIL.JpegImagePlugin import JpegImageFile
 from nodes import PreviewImage, SaveImage
 import folder_paths
+from comfy.cli_args import args
 
 from ..core import CATEGORY, CONFIG, BOOLEAN, METADATA_RAW,TEXTS, setWidgetValues, logger, getResolutionByTensor, get_size
+
+
+def _is_main_rank():
+    """
+    Returns True on single-process runs or when this process is the main (rank 0) process
+    in a distributed multi-GPU setup.
+    """
+    try:
+        world_size = getattr(args, "world_size", 1)
+        rank = getattr(args, "rank", 0)
+    except Exception:
+        world_size = 1
+        rank = 0
+    return world_size <= 1 or rank == 0
+
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), "comfy"))
 
@@ -61,37 +77,42 @@ class CImagePreviewFromImage(PreviewImage):
                 "images": [],
             }
         }
-
+    
         if image is not None:
-            saved = self.save_images(image, "crystools/i", prompt, extra_pnginfo)
-            image = saved["ui"]["images"][0]
-            image_path = Path(self.output_dir).joinpath(image["subfolder"], image["filename"])
-
-            img, promptFromImage, metadata = buildMetadata(image_path)
-
-            images = [image]
-            result = metadata
-
-            data["result"] = [result]
-            data["ui"]["images"] = images
-
-            title = "Source: Image link \n"
-            text += buildPreviewText(metadata)
-            text += f"Current prompt (NO FROM IMAGE!):\n"
-            text += json.dumps(promptFromImage, indent=CONFIG["indent"])
-
-            self.data_cached_text = text
-            self.data_cached = data
-
+            if not _is_main_rank():
+                # On non-main ranks in distributed runs, skip disk I/O to avoid missing-file errors.
+                title = "Source: Image link - SKIPPED ON NON-MAIN RANK\n"
+                text = "Crystools image preview is only executed on the main rank in multi-GPU mode."
+            else:
+                saved = self.save_images(image, "crystools/i", prompt, extra_pnginfo)
+                image = saved["ui"]["images"][0]
+                image_path = Path(self.output_dir).joinpath(image["subfolder"], image["filename"])
+    
+                img, promptFromImage, metadata = buildMetadata(image_path)
+    
+                images = [image]
+                result = metadata
+    
+                data["result"] = [result]
+                data["ui"]["images"] = images
+    
+                title = "Source: Image link \n"
+                text += buildPreviewText(metadata)
+                text += f"Current prompt (NO FROM IMAGE!):\n"
+                text += json.dumps(promptFromImage, indent=CONFIG["indent"])
+    
+                self.data_cached_text = text
+                self.data_cached = data
+    
         elif image is None and self.data_cached is not None:
             title = "Source: Image link - CACHED\n"
             data = self.data_cached
             text = self.data_cached_text
-
+    
         else:
             logger.debug("Source: Empty on CImagePreviewFromImage")
             text = "Source: Empty"
-
+    
         data['ui']['text'] = [title + text]
         return data
 
@@ -163,35 +184,38 @@ class CImagePreviewFromMetadata(PreviewImage):
 
     def resolveImage(self, filename=None):
         images = []
-
+    
+        if not _is_main_rank():
+            return images
+    
         if filename is not None:
             image_input_folder = os.path.normpath(folder_paths.get_input_directory())
             image_input_folder_abs = Path(image_input_folder).resolve()
-
+    
             image_path = os.path.normpath(filename)
             image_path_abs = Path(image_path).resolve()
-
+    
             if Path(image_path_abs).is_file() is False:
                 raise Exception(TEXTS.FILE_NOT_FOUND.value)
-
+    
             try:
                 # get common path, should be input/output/temp folder
                 common = os.path.commonpath([image_input_folder_abs, image_path_abs])
-
+    
                 if common != image_input_folder:
                     raise Exception("Path invalid (should be in the input folder)")
-
+    
                 relative = os.path.normpath(os.path.relpath(image_path_abs, image_input_folder_abs))
-
+    
                 images.append({
                     "filename": Path(relative).name,
                     "subfolder": os.path.dirname(relative),
                     "type": "input"
                 })
-
+    
             except Exception as e:
                 logger.warn(e)
-
+    
         return images
 
 
@@ -261,8 +285,14 @@ class CImageLoadWithMetadata:
     FUNCTION = "execute"
 
     def execute(self, image):
+        if not _is_main_rank():
+            # Avoid disk I/O on non-main ranks; return a dummy image/mask/prompt/metadata.
+            dummy_image = torch.zeros((1, 64, 64, 3), dtype=torch.float32)
+            dummy_mask = torch.zeros((1, 64, 64), dtype=torch.float32)
+            return dummy_image, dummy_mask, {}, {}
+    
         image_path = folder_paths.get_annotated_filepath(image)
-
+    
         imgF = Image.open(image_path)
         img, prompt, metadata = buildMetadata(image_path)
         if imgF.format == 'WEBP':
@@ -272,7 +302,7 @@ class CImageLoadWithMetadata:
               prompt, metadata = self.process_exif_data(exif_data)
             except ValueError:
               prompt = {}
-
+    
         img = ImageOps.exif_transpose(img)
         image = img.convert("RGB")
         image = np.array(image).astype(np.float32) / 255.0
@@ -282,7 +312,7 @@ class CImageLoadWithMetadata:
             mask = 1. - torch.from_numpy(mask)
         else:
             mask = torch.zeros((64, 64), dtype=torch.float32, device="cpu")
-
+    
         return image, mask.unsqueeze(0), prompt, metadata
 
     def process_exif_data(self, exif_data):
@@ -382,13 +412,17 @@ class CImageSaveWithExtraMetadata(SaveImage):
             }
         }
         if image is not None:
+            if not _is_main_rank():
+                # On non-main ranks, skip saving/reading files to avoid missing-file errors.
+                return data
+    
             if with_workflow is True:
                 extra_pnginfo_new = extra_pnginfo.copy()
                 prompt = prompt.copy()
             else:
                 extra_pnginfo_new = None
                 prompt = None
-
+    
             if metadata_extra is not None and metadata_extra != 'undefined':
                 try:
                     # metadata_extra = json.loads(f"{{{metadata_extra}}}") // a fix?
@@ -396,29 +430,29 @@ class CImageSaveWithExtraMetadata(SaveImage):
                 except Exception as e:
                     logger.error(f"Error parsing metadata_extra (it will send as string), error: {e}")
                     metadata_extra = {"extra": str(metadata_extra)}
-
+    
                 if isinstance(metadata_extra, dict):
                     for k, v in metadata_extra.items():
                         if extra_pnginfo_new is None:
                             extra_pnginfo_new = {}
-
+    
                         extra_pnginfo_new[k] = v
-
+    
             saved = super().save_images(image, filename_prefix, prompt, extra_pnginfo_new)
-
+    
             image = saved["ui"]["images"][0]
             image_path = Path(self.output_dir).joinpath(image["subfolder"], image["filename"])
             img, promptFromImage, metadata = buildMetadata(image_path)
-
+    
             images = [image]
             result = metadata
-
+    
             data["result"] = [result]
             data["ui"]["images"] = images
-
+    
         else:
             logger.debug("Source: Empty on CImageSaveWithExtraMetadata")
-
+    
         return data
 
 

@@ -2,8 +2,8 @@
 @author: Crystian
 @title: Crystools
 @nickname: Crystools
-@version: 1.16.4
-@project: "https://github.com/crystian/ComfyUI-Crystools",
+@version: 1.27.4
+@project: "https://github.com/crystian/comfyui-crystools",
 @description: Plugins for multiples uses, mainly for debugging, you need them! IG: https://www.instagram.com/crystian.ia
 """
 
@@ -13,7 +13,7 @@ logger.info(f'Crystools version: {version}')
 from .nodes._names import CLASSES
 from .nodes.primitive import CBoolean, CText, CTextML, CInteger, CFloat
 from .nodes.switch import CSwitchBooleanAny, CSwitchBooleanLatent, CSwitchBooleanConditioning, CSwitchBooleanImage, \
-  CSwitchBooleanString, CSwitchBooleanMask
+  CSwitchBooleanString, CSwitchBooleanMask, CSwitchFromAny
 from .nodes.debugger import CConsoleAny, CConsoleAnyToJson
 from .nodes.image import CImagePreviewFromImage, CImageLoadWithMetadata, CImageGetResolution, CImagePreviewFromMetadata, \
     CImageSaveWithExtraMetadata
@@ -21,6 +21,7 @@ from .nodes.list import CListAny, CListString
 from .nodes.pipe import CPipeToAny, CPipeFromAny
 from .nodes.utils import CUtilsCompareJsons, CUtilsStatSystem
 from .nodes.metadata import CMetadataExtractor, CMetadataCompare
+from .nodes.parameters import CJsonFile, CJsonExtractor
 # from .server import *
 # from .general import *
 
@@ -37,6 +38,7 @@ NODE_CLASS_MAPPINGS = {
     CLASSES.CLIST_ANY_NAME.value: CListAny,
     CLASSES.CLIST_STRING_NAME.value: CListString,
 
+    CLASSES.CSWITCH_FROM_ANY_NAME.value: CSwitchFromAny,
     CLASSES.CSWITCH_ANY_NAME.value: CSwitchBooleanAny,
     CLASSES.CSWITCH_LATENT_NAME.value: CSwitchBooleanLatent,
     CLASSES.CSWITCH_CONDITIONING_NAME.value: CSwitchBooleanConditioning,
@@ -56,7 +58,9 @@ NODE_CLASS_MAPPINGS = {
     CLASSES.CMETADATA_EXTRACTOR_NAME.value: CMetadataExtractor,
     CLASSES.CMETADATA_COMPARATOR_NAME.value: CMetadataCompare,
     CLASSES.CUTILS_JSON_COMPARATOR_NAME.value: CUtilsCompareJsons,
-    CLASSES.CUTILS_STAT_SYSTEM_NAME.value: CUtilsStatSystem
+    CLASSES.CUTILS_STAT_SYSTEM_NAME.value: CUtilsStatSystem,
+    CLASSES.CJSONFILE_NAME.value: CJsonFile,
+    CLASSES.CJSONEXTRACTOR_NAME.value: CJsonExtractor,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -72,6 +76,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     CLASSES.CLIST_ANY_NAME.value: CLASSES.CLIST_ANY_DESC.value,
     CLASSES.CLIST_STRING_NAME.value: CLASSES.CLIST_STRING_DESC.value,
 
+    CLASSES.CSWITCH_FROM_ANY_NAME.value: CLASSES.CSWITCH_FROM_ANY_DESC.value,
     CLASSES.CSWITCH_ANY_NAME.value: CLASSES.CSWITCH_ANY_DESC.value,
     CLASSES.CSWITCH_LATENT_NAME.value: CLASSES.CSWITCH_LATENT_DESC.value,
     CLASSES.CSWITCH_CONDITIONING_NAME.value: CLASSES.CSWITCH_CONDITIONING_DESC.value,
@@ -93,7 +98,11 @@ NODE_DISPLAY_NAME_MAPPINGS = {
 
     CLASSES.CUTILS_JSON_COMPARATOR_NAME.value: CLASSES.CUTILS_JSON_COMPARATOR_DESC.value,
     CLASSES.CUTILS_STAT_SYSTEM_NAME.value: CLASSES.CUTILS_STAT_SYSTEM_DESC.value,
+
+    CLASSES.CJSONFILE_NAME.value: CLASSES.CJSONFILE_DESC.value,
+    CLASSES.CJSONEXTRACTOR_NAME.value: CLASSES.CJSONEXTRACTOR_DESC.value,
 }
 
 
 WEB_DIRECTORY = "./web"
+__all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS", "WEB_DIRECTORY"]

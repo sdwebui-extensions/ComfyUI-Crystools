@@ -28,6 +28,8 @@ class CLASSES(Enum):
     CLIST_STRING_NAME = 'List of strings [Crystools]'
     CLIST_STRING_DESC = prefix + 'List of strings'
 
+    CSWITCH_FROM_ANY_NAME = 'Switch from any [Crystools]'
+    CSWITCH_FROM_ANY_DESC = prefix + 'Switch from any'
     CSWITCH_ANY_NAME = 'Switch any [Crystools]'
     CSWITCH_ANY_DESC = prefix + 'Switch any'
     CSWITCH_STRING_NAME = 'Switch string [Crystools]'
@@ -63,7 +65,16 @@ class CLASSES(Enum):
     CMETADATA_COMPARATOR_NAME = 'Metadata comparator [Crystools]'
     CMETADATA_COMPARATOR_DESC = prefix + 'Metadata comparator'
 
-    CUTILS_JSON_COMPARATOR_NAME = 'Json comparator [Crystools]'
-    CUTILS_JSON_COMPARATOR_DESC = prefix + 'Json comparator'
+    CUTILS_JSON_COMPARATOR_NAME = 'JSON comparator [Crystools]'
+    CUTILS_JSON_COMPARATOR_DESC = prefix + 'JSON comparator'
     CUTILS_STAT_SYSTEM_NAME = 'Stats system [Crystools]'
     CUTILS_STAT_SYSTEM_DESC = prefix + 'Stats system (powered by WAS)'
+
+    # CPARAMETERS_NAME = 'External parameter from JSON file [Crystools]'
+    # CPARAMETERS_DESC = prefix + 'External parameters from JSON file'
+
+    CJSONFILE_NAME = 'Read JSON file [Crystools]'
+    CJSONFILE_DESC = prefix + 'Read JSON file (BETA)'
+
+    CJSONEXTRACTOR_NAME = 'JSON extractor [Crystools]'
+    CJSONEXTRACTOR_DESC = prefix + 'JSON extractor (BETA)'

@@ -105,3 +105,15 @@ def get_size(path):
         return f"{round(size / (pow(1024, 2)), 2)} MB"
     elif size < pow(1024, 4):
         return f"{round(size / (pow(1024, 3)), 2)} GB"
+
+
+def get_nested_value(data, dotted_key, default=None):
+  keys = dotted_key.split('.')
+  for key in keys:
+    if isinstance(data, str):
+        data = json.loads(data)
+    if isinstance(data, dict) and key in data:
+      data = data[key]
+    else:
+      return default
+  return data

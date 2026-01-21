@@ -1,4 +1,4 @@
-# ComfyUI-Crystools [![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fcrystian%2FComfyUI-Crystools&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com) [![Donate](https://img.shields.io/badge/Donate-PayPal-blue.svg)](https://paypal.me/crystian77) <a src="https://colab.research.google.com/assets/colab-badge.svg" href="https://colab.research.google.com/drive/1xiTiPmZkcIqNOsLQPO1UNCdJZqgK3U5k?usp=sharing"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open in Colab"></a>
+# comfyui-crystools [![Donate](https://img.shields.io/badge/Donate-PayPal-blue.svg)](https://paypal.me/crystian77) <a src="https://colab.research.google.com/assets/colab-badge.svg" href="https://colab.research.google.com/drive/1xiTiPmZkcIqNOsLQPO1UNCdJZqgK3U5k?usp=sharing"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open in Colab"></a>
 
 **_🪛 A powerful set of tools for your belt when you work with ComfyUI 🪛_**
 
@@ -27,7 +27,11 @@ This provides better nodes to load/save images, previews, etc, and see "hidden" 
 
 **🎉Finally, you can see the resources used by ComfyUI (CPU, GPU, RAM, VRAM, GPU Temp and space) on the menu in real-time!**
 
-![Monitors](./docs/monitor.webp)
+Horizontal:  
+![Monitors](./docs/monitor1.webp)
+
+Vertical:  
+![Monitors](./docs/monitor3.webp)
 
 Now you can identify the bottlenecks in your workflow and know when it's time to restart the server, unload models or even close some tabs!
 
@@ -51,7 +55,7 @@ You can see the progress of your workflow with a progress bar on the menu!
 
 ![Progress bar](./docs/progress-bar.png)
 
-https://github.com/crystian/ComfyUI-Crystools/assets/3886806/35cc1257-2199-4b85-936e-2e31d892959c
+https://github.com/crystian/comfyui-crystools/assets/3886806/35cc1257-2199-4b85-936e-2e31d892959c
 
 Additionally, it shows the time elapsed at the end of the workflow, and you can `click` on it to see the **current working node.** 
 
@@ -512,6 +516,44 @@ You have predefined switches (string, latent, image, conditioning) but you can u
 
 ### Crystools
 
+### 1.27.0 (17/08/2025)
+- revert the lower case on name, cannot change on registry ¯\_(ツ)_/¯
+- zluda check removed, it is not necessary anymore
+
+### 1.25.3 (27/07/2025)
+- change the name to lower case
+
+### 1.25.1 (02/06/2025)
+- fix issues with switches on settings menu
+- node: "Switch from any" added
+- load image with metadata: filtered (exclude hidden folders an typically metadata files)
+- other fixes
+
+### 1.24.0 (02/06/2025)
+- PRs by community merged
+- Improved VRAM usage/readout
+- HDD error handling
+- Lazy switches
+
+### 1.23.0 (02/06/2025)
+- Jetson support added by @johnnynunez
+- some ui fixes
+
+### 1.20.0 (21/10/2024)
+- BETA of JSON file reader and extractor, to allow you to read your own JSON files and extract the values to use in your workflow 
+
+### 1.19.0 (06/10/2024)
+- HORIZONTAL UI! New version is ready! 🎉
+
+### 1.18.0 (21/09/2024)
+- HORIZONTAL UI! 🎉
+- Configurable size of monitors on settings menu
+
+### 1.17.0 (21/09/2024)
+- Settings menu reorganized
+- Preparing for horizontal UI
+- Update from ComfyUI (typescript and new features)
+
 ### 1.16.0 (31/07/2024)
 - Rollback of AMD support by manager does not support other repository parameter (https://test.pypi.org/simple by pyrsmi)
 
@@ -542,7 +584,7 @@ You have predefined switches (string, latent, image, conditioning) but you can u
 - Typescript added!
 
 ### 1.6.0 (11/01/2024)
-- Fix issue [#7](https://github.com/crystian/ComfyUI-Crystools/issues/7) to the thread deadlock on concurrency
+- Fix issue [#7](https://github.com/crystian/comfyui-crystools/issues/7) to the thread deadlock on concurrency
 
 ### 1.5.0 (10/01/2024)
 - Improvements on the resources monitor and how handle the threads
@@ -563,7 +605,7 @@ You have predefined switches (string, latent, image, conditioning) but you can u
 - First release
 
 
-### Crystools-save
+### Crystools-save - DEPRECATED (01/06/2025)
 
 ### 1.1.0 (07/01/2024)
 - Labeling updated according to the new version of Crystools (this project)
@@ -577,11 +619,11 @@ You have predefined switches (string, latent, image, conditioning) but you can u
 
 ### Install from GitHub
 1. Install [ComfyUi](https://github.com/comfyanonymous/ComfyUI).
-2. Clone this repo into `custom_modules`:
+2. Clone this repo into `custom_nodes`:
     ```
     cd ComfyUI/custom_nodes
-    git clone https://github.com/crystian/ComfyUI-Crystools.git
-    cd ComfyUI-Crystools
+    git clone https://github.com/crystian/comfyui-crystools.git
+    cd comfyui-crystools
     pip install -r requirements.txt
     ```
 3. Start up ComfyUI.
@@ -593,8 +635,8 @@ If you are an AMD user with Linux, you can try the AMD branch:
 
   ```
   cd ComfyUI/custom_nodes
-  git clone -b AMD https://github.com/crystian/ComfyUI-Crystools.git
-  cd ComfyUI-Crystools
+  git clone -b AMD https://github.com/crystian/comfyui-crystools.git
+  cd comfyui-crystools
   pip install -r requirements.txt
   ```
 
